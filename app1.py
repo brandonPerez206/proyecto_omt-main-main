@@ -11,18 +11,20 @@ from routes.registros_routes import registros_bp
 from routes.usuarios_routes import usuarios_bp
 from routes.historial_routes import historial_bp
 
-load_dotenv()
 
-app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "dev-secret")
+
+# 1. Asegura una ruta absoluta para evitar que se cree en carpetas temporales
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'database.db') # Ajusta el nombre a tu archivo
 
 def init_db():
-    conn = sqlite3.connect('tu_base_de_datos.db')
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
+    # Crea la tabla si no existe
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS usuarios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            usuario TEXT NOT NULL,
+            usuario TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             rol TEXT
         )
@@ -30,8 +32,12 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Llama a la función antes de que corra el servidor
+# Ejecuta esta función antes de cualquier consulta
 init_db()
+load_dotenv()
+
+app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "dev-secret")
 
 # Configuración del correo
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
