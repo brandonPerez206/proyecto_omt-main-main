@@ -10,12 +10,11 @@ from routes.dashboard_routes import dashboard_bp
 from routes.registros_routes import registros_bp
 from routes.usuarios_routes import usuarios_bp
 from routes.historial_routes import historial_bp
+from flask import request, abort
 
 
-
-# 1. Asegura una ruta absoluta para evitar que se cree en carpetas temporales
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, 'database.db') # Ajusta el nombre a tu archivo
+DB_PATH = os.path.join(BASE_DIR, 'database.db') 
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)
@@ -32,7 +31,7 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Ejecuta esta función antes de cualquier consulta
+
 init_db()
 load_dotenv()
 
@@ -66,3 +65,18 @@ def health():
 @app.route('/test')
 def test():
     return "HTTPS funciona"
+
+ALLOWED_IPS = [
+    "179.1.103.82"  
+]
+
+@app.before_request
+def allow_only_company():
+    client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+
+    # Si viene con múltiples IPs, tomar la primera
+    if client_ip:
+        client_ip = client_ip.split(',')[0].strip()
+
+    if client_ip not in ALLOWED_IPS:
+        abort(403)
