@@ -93,7 +93,7 @@ def cambiar_contrasena(user_id):
 
     if not user:
         conn.close()
-        flash("Usuario no encontrado.", "danger")
+        flash("Usuario Eliminado Correctamente.", "danger")
         return redirect(url_for('usuarios.usuarios'))
 
     if request.method == 'POST':
