@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel - Bitácoras OMT Alico</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f9;
+      color: #333;
+    }
+
+    header {
+      background-color: #14213d;
+      color: white;
+      padding: 15px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      font-size: 20px;
+      margin: 0;
+    }
+
+    nav a {
+      color: white;
+      margin-left: 20px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      padding: 30px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      color: #14213d;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      border-bottom: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background: #14213d;
+      color: white;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: #14213d;
+      color: white;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+    
+    .flash-message {
+      cursor: pointer;
+    }
+    
+    .flash-message {
+      padding: 14px 20px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      font-weight: 500;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      opacity: 1;
+      transform: translateX(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .flash-message.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .flash-message.hide {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+
+    .flash-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      width: auto;
+      max-width: 350px;
+    }
+
+    .flash-message {
+      padding: 14px 20px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      font-weight: 500;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      opacity: 1;
+      animation: slideIn 0.5s ease forwards;
+    }
+
+    .flash-message.success {
+      background-color: #d1e7dd;
+      color: #0f5132;
+      border-left: 5px solid #0f5132;
+    }
+
+    .flash-message.error,
+    .flash-message.danger {
+      background-color: #f8d7da;
+      color: #842029;
+      border-left: 5px solid #842029;
+    }
+
+    .flash-message.warning {
+      background-color: #fff3cd;
+      color: #664d03;
+      border-left: 5px solid #664d03;
+    }
+  </style>
+</head>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash-message {{ category }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+<body>
+  <header>
+    <h1>Bitácoras OMT Alico</h1>
+    <h2>Bienvenido, {{ usuario }}</h2>
+    <p>Rol: {{ rol }}</p>
+
+    <nav>
+      <a href="/dashboard">Inicio</a>
+      <a href="/registros">Registros</a>
+      {% if session['rol'] == 'Administrador' %}
+      <a href="/usuarios">Usuarios</a>
+      {% endif %}
+      <a href="/historial">Historial</a>
+      <a href="/logout">Cerrar sesión</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h2>Bienvenido al Panel de Administración</h2>
+      <p>Desde aquí puedes gestionar las bitácoras, ver los registros y administrar los usuarios OMT.</p>
+    </div>
+
+    <div class="card">
+  <h2>Últimos eventos registrados</h2>
+  {% if ultimos %}
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Usuario</th>
+        <th>Tipo</th>
+        <th>Caracteristica</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in ultimos %}
+      <tr>
+        <td>{{ r[0] }}</td>
+        <td>{{ r[1] }}</td>
+        <td>{{ r[2] }}</td>
+        <td>{{ r[3] }}</td>
+        <td>{{ r[4] }}</td>
+        <td>{{ r[5] if r[5] else '-' }}</td>
+        <td>{{ r[6] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No hay registros recientes.</p>
+  {% endif %}
+</div>
+  <footer>
+    © 2025 Bitácoras OMT Alico — Sistema de Registro Interno
+  </footer>
+  <script>
+  window.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".flash-message").forEach(msg => {
+
+      try { alertSound.play(); } catch(e) {}
+
+      setTimeout(() => msg.classList.add("show"), 50);
+
+      const autoClose = setTimeout(() => {
+        closeMessage(msg);
+      }, 5000);
+
+      msg.addEventListener("click", () => {
+        clearTimeout(autoClose);
+        closeMessage(msg);
+      });
+
+    });
+
+    function closeMessage(msg) {
+      msg.classList.remove("show");
+      msg.classList.add("hide");
+
+      setTimeout(() => msg.remove(), 800);
+    }
+  });
+</script>
+<script>
+  const alertSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3");
+  alertSound.volume = 0.25; 
+</script>
+</body>
+</html>
