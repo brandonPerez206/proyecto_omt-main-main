@@ -65,18 +65,3 @@ def health():
 @app.route('/test')
 def test():
     return "HTTPS funciona"
-
-ALLOWED_IPS = [
-    "179.1.103.82"  
-]
-
-@app.before_request
-def allow_only_company():
-    client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-
-    # Si viene con múltiples IPs, tomar la primera
-    if client_ip:
-        client_ip = client_ip.split(',')[0].strip()
-
-    if client_ip not in ALLOWED_IPS:
-        abort(403)
