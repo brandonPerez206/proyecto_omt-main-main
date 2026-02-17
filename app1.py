@@ -10,7 +10,6 @@ from routes.dashboard_routes import dashboard_bp
 from routes.registros_routes import registros_bp
 from routes.usuarios_routes import usuarios_bp
 from routes.historial_routes import historial_bp
-from flask import request, abort
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
